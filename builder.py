@@ -3,7 +3,7 @@ import cffi
 ffibuilder = cffi.FFI()
 
 header = '''
-extern void get_rates(double *, double *, double *, double *, int32_t *, double *, double *);
+extern void get_rates(double *, double *, double *, double *, double *, int32_t *, double *, double *);
 '''
 
 module = '''
@@ -19,19 +19,20 @@ import prediction_pipe
 from my_plugin import ffi
 
 @ffi.def_extern()
-def get_rates(x1_ptr, x2_ptr, x3_ptr, x4_ptr, n_ptr, y1_ptr, y2_ptr):
+def get_rates(x1_ptr, x2_ptr, x3_ptr, x4_ptr, x5_ptr, n_ptr, y1_ptr, y2_ptr):
     
     # gearbox in
     T_gas = gearbox.as_single(ffi, x1_ptr)
     nH = gearbox.as_single(ffi, x2_ptr) 
     n_H = gearbox.as_single(ffi, x3_ptr)
     n = gearbox.as_single(ffi, n_ptr)
-    rf = gearbox.as_array(ffi, x4_ptr, shape=(n,))
+    lam = gearbox.as_array(ffi, x4_ptr, shape=(n,))
+    u = gearbox.as_array(ffi, x5_ptr, shape=(n,))
     
-    print('input received: T_gas:' , T_gas, '\t n(H):' , nH, '\t n_H:' , n_H, '\t rf:' , rf)
+    print('input received: T_gas:' , T_gas, '\t n(H):' , nH, '\t n_H:' , n_H, '\t rf: spectral shape', u.shape, '...')
     
     # call python main function
-    LH, ER = prediction_pipe.make_prediction(T_gas, nH, n_H, rf)
+    LH, ER = prediction_pipe.make_prediction(T_gas, nH, n_H, lam, u)
     print('Prediction results: ', LH, ER)
     
     # gearbox out

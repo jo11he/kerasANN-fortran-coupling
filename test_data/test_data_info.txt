@@ -1,0 +1,16 @@
+# Test Data information
+# single sample
+
+genT02 
+sample no. 1
+
+T_gas = 4.113083490000000353e+01
+nH = 1.194153369999999995e+05
+n_H = 1.000000000000000000e+08
+
+rf from PDR17G1E20_n3p5e5r3p5e3A1e1, pre-transition, Av: 4.812727E-03
+
+
+   !DESIRED OUTPUT (Reference labels):
+   ! LH 4.454582101342124460e-18
+   ! ER 1.761998920326483102e-19
