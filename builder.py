@@ -29,11 +29,11 @@ def get_rates(x1_ptr, x2_ptr, x3_ptr, x4_ptr, x5_ptr, n_ptr, y1_ptr, y2_ptr):
     lam = gearbox.as_array(ffi, x4_ptr, shape=(n,))
     u = gearbox.as_array(ffi, x5_ptr, shape=(n,))
     
-    print('input received: T_gas:' , T_gas, '\t n(H):' , nH, '\t n_H:' , n_H, '\t rf: spectral shape', u.shape, '...')
+    #print('input received: T_gas:' , T_gas, '\t n(H):' , nH, '\t n_H:' , n_H, '\t rf: spectral shape', u.shape, '...')
     
     # call python main function
     LH, ER = prediction_pipe.make_prediction(T_gas, nH, n_H, lam, u)
-    print('Prediction results: ', LH, ER)
+    #print('Prediction results: ', LH, ER)
     
     # gearbox out
     gearbox.get(LH, y1_ptr, 1, ffi)

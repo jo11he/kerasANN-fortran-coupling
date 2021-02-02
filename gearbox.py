@@ -1,6 +1,10 @@
-# gearbox.by
+# gearbox.py
+# modelled after: https://www.noahbrenowitz.com/post/calling-fortran-from-python/
 
 import numpy as np
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+warnings.simplefilter(action='ignore', category=DeprecationWarning)
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ### ###  Create the dictionary mapping ctypes to np dtypes. ### ###
@@ -13,8 +17,7 @@ for prefix in ('int', 'uint'):
     for log_bytes in range(4):
         ctype = '%s%d_t' % (prefix, 8 * (2**log_bytes))
         dtype = '%s%d' % (prefix[0], 2**log_bytes)
-        # print( ctype )
-        # print( dtype )
+
         ctype2dtype[ctype] = np.dtype(dtype)
 
 # Floating point types
@@ -32,18 +35,13 @@ ctype2dtype['double'] = np.dtype('f8')
 def as_array(ffi, ptr, shape, **kwargs):
 
     length = np.prod(shape)
-    print('LENGTH: ', length)
-    print('SHAPE: ', shape)
     # Get the canonical C type of the elements of ptr as a string.
     T = ffi.getctype(ffi.typeof(ptr).item)
-    print( T )
-    print( ffi.sizeof( T ) )
 
     if T not in ctype2dtype:
         raise RuntimeError("Cannot create array from element type: %s" % T)
 
     a = np.frombuffer(ffi.buffer(ptr, length * ffi.sizeof(T)), ctype2dtype[T]).reshape(shape, **kwargs)
-    print('return: ', a)
     return a
 
 
@@ -51,18 +49,13 @@ def as_array(ffi, ptr, shape, **kwargs):
 def as_single(ffi, ptr, **kwargs):
     shape = (1,)
     length = 1
-    # print('LENGTH: ', length)
-    # print('SHAPE: ', shape)
-    # Get the canonical C type of the elements of ptr as a string.
     T = ffi.getctype(ffi.typeof(ptr).item)
-    # print( T )
-    # print( ffi.sizeof( T ) )
+
 
     if T not in ctype2dtype:
         raise RuntimeError("Cannot create array from element type: %s" % T)
 
     a = np.frombuffer(ffi.buffer(ptr, length * ffi.sizeof(T)), ctype2dtype[T]).reshape(shape, **kwargs)
-    # print('return: ', a)
     return a[0]
 
 

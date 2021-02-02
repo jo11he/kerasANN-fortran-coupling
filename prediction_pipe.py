@@ -1,19 +1,28 @@
 #prediciton_pipe.py
 
 import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 import numpy as np
+#import warnings
+#warnings.simplefilter(action='ignore', category=FutureWarning)
+#warnings.simplefilter(action='ignore', category=DeprecationWarning)
+#warnings.simplefilter(action='ignore', category=Warning)
 
 from transform_tools import final_sampling_bands, transform_single_spectrum, skim_TS
 
 from tensorflow.keras.models import load_model
-
+from tensorflow import compat
+compat.v1.logging.set_verbosity(compat.v1.logging.ERROR)
 
 
 #functional implementation of spectrum transformation
 def single_spectrum_transform(S, bands=final_sampling_bands(), samples_per_band=[5, 3, 5, 6, 1],
-                              lin_bip_idx=[1], manual_idx=[3], manual=[3.6e5, 4.8e5, 6e5, 8e5, 14.6e5, 32e5]):
+                              lin_bip_idx=[1], manual_idx=[3], manual=[3.6e5, 4.8e5, 6e5, 8e5, 14.6e5, 32e5],
+                              verbose=0):
 
-    print('Transforming spectrum ')
+    verboseprint = print if verbose else lambda *a, **k: None
+
+    verboseprint('Transforming spectrum ')
     TS, __ = transform_single_spectrum(S, samples_per_band, bands=bands, array_out=True,
                                           lin_bip_idx=lin_bip_idx, manual_idx=manual_idx, manual=manual)
 
@@ -24,7 +33,10 @@ def single_spectrum_transform(S, bands=final_sampling_bands(), samples_per_band=
 
 # function for (reverse) scaling of x_data and y_data when scaling coefficients exist already
 # taken from LEGACY/B_datasets/DataSet_utils.py (Jan 29., commit 29e4f8932c5f0231d58797e510e7d488929859b8)
-def fixed_coeff_scaler(data, coeffs, slopes_inds=[23, 24, 25], mode='to_unit'):
+def fixed_coeff_scaler(data, coeffs, slopes_inds=[23, 24, 25], mode='to_unit', verbose=0):
+
+    verboseprint = print if verbose else lambda *a, **k: None
+
     if mode == 'to_unit':
 
         if data.shape[1] == coeffs.shape[0]:
@@ -52,7 +64,7 @@ def fixed_coeff_scaler(data, coeffs, slopes_inds=[23, 24, 25], mode='to_unit'):
                 else:
                     scaled_data = np.concatenate((scaled_data, scaled_col_data.reshape(-1, 1)), axis=1)
 
-            print('\ntest scaling:\n', np.amax(scaled_data, axis=0), '\n', np.amin(scaled_data, axis=0))
+            verboseprint('\ntest scaling:\n', np.amax(scaled_data, axis=0), '\n', np.amin(scaled_data, axis=0))
 
             return scaled_data
 
@@ -121,7 +133,6 @@ def make_prediction(T_gas, nH, n_H, lam, u):
 
     # # # # # # # TRANSFORM SPECTRUM # # # # # # #
     rf = single_spectrum_transform(S)
-    print('rf after transform: ', rf)
 
     # # # # # LOADING DATA SCALERS # # # # # # # #
     x_scaling_coeffs = np.loadtxt(os.path.join(path_to_scalers, 'x_scaling_coeffs.txt'))
