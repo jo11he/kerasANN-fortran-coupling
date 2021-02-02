@@ -12,7 +12,7 @@ import numpy as np
 
 import sys
 # add local dir to load own modules 
-sys.path.extend(['.']) #(gearbox, prediction_pipe)
+sys.path.extend(['./pythonANN']) #(gearbox, prediction_pipe)
 import gearbox
 import prediction_pipe
 

@@ -1,4 +1,4 @@
-!compile w/ shared library: 'gfortran -o run_test -L./ -lplugin test_main.f90'
+!compile w/ shared library: 'gfortran -o run_test -L ./pythonANN/ -lplugin test_pythonANN.f90'
 
 PROGRAM COUPLING_TEST
    use, intrinsic :: iso_c_binding
@@ -37,7 +37,7 @@ PROGRAM COUPLING_TEST
    n_H = 1.000000000000000000e+08
 
    !read in lambda from test file
-	open (unit=1, file='./test_data/lam_test.txt', status='old', action='read')
+	open (unit=1, file='./pythonANN/test_data/lam_test.txt', status='old', action='read')
 
 		read(1,*) l_count
 		allocate (l(l_count))
@@ -47,7 +47,7 @@ PROGRAM COUPLING_TEST
 	close(1)
 
    !read in u from test file
-   	open (unit=1, file='./test_data/u_test.txt', status='old', action='read')
+   	open (unit=1, file='./pythonANN/test_data/u_test.txt', status='old', action='read')
 
 		read(1,*) u_count
 		allocate (u(u_count))

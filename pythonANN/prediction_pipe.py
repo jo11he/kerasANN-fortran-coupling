@@ -123,8 +123,8 @@ def x_data_treatment(T_gas, nH, n_H, rf, x_scaler):
 def make_prediction(T_gas, nH, n_H, lam, u):
 
     # # # # IMPORTANT PATH VARIABLES # # # # # # #
-    path_to_scalers = './scalers'  # scalers usually shipped in this directory
-    path_to_models = './models' # models usually shipped in this directory
+    path_to_scalers = './pythonANN/scalers'  # scalers usually shipped in this directory
+    path_to_models = './pythonANN/models' # models usually shipped in this directory
 
     # # # # # # # CAST ARRAYS INTO S # # # # # # #
     lam = lam.reshape(-1, 1)
