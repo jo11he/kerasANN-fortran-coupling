@@ -2,14 +2,17 @@
 #########################################################################
 # # # # # # # # # Transformation functions and wrapper # # # # # # # # #
 #########################################################################
-
+from __future__ import print_function
 import numpy as np
 import scipy as sc
 import scipy.interpolate
 import scipy.integrate
 import warnings
+
 warnings.simplefilter(action='ignore', category=FutureWarning)
 warnings.simplefilter(action='ignore', category=DeprecationWarning)
+
+
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -165,7 +168,7 @@ def skim_TS(data):
 def transform_single_spectrum(S, s_per_b, bands=final_sampling_bands(), array_in=[], array_out=True, lin_bip_idx=[1],
                        manual_idx=[], manual=[], verbose=0):
 
-    verboseprint = print if verbose else lambda *a, **k: None
+    verboseprint = print_function if verbose else lambda *a, **k: None
 
     TS_lst = []
     S_p_lst = []

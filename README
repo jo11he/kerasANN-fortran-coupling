@@ -1,10 +1,39 @@
-for structured version of pythonANN_coupling:
+Structured, quiet version of ANN-PDR integration:
+	
+	- testfile ./test_pythonANN.f90
+	- all code for integration is bundeled in ./pythonANN
 
-all code (i.e. py modules, shared lib, .h, .o, .c) is kept in a subdirectory ./pythonANN w.r.t fortran executable
+	
+	1. in ./pythonANN run python builder.py -> creates shared libraries for given machine 
+		
+		linux: results in libplugin.so 
+		macOS: results in libplugin.dylib
+		-> has to be followed up by 'install_name_tool -id "@loader_path/pythonANN/libplugin.dylib" libplugin.dylib' for runtime linking 
 
-in ./pythonANN: build shared library via 'python builder.py'
-                enable runtime linking of shared lib via 'install_name_tool -id "@rpath/libplugin.dylib" libplugin.dylib'
+	2. in . compile fortran executable with linked shared library 
 
-in ./ : 	compile fortran executable with linked shared library via 'gfortran -o run_test -L ./pythonANN/ -lplugin test_pythonANN.f90'
-                enable runtime linking of shared lib via 'install_name_tool -change libplugin.dylib @loader_path/pythonANN/libplugin.dylib run_test'
-                                                     and 'install_name_tool -add_rpath @loader_path/pythonANN/ run_test'
+		linux: use 'gfortran -o run_test -Wl,-rpath=./pythonANN/ -L ./pythonANN/ -lplugin test_pythonANN.f90'
+			runtime linking of shared lib enables via -Wl,-rpath=./pythonANN/ flag		
+
+		macOS: use 'gfortran -o run_test -L ./pythonANN/ -lplugin test_pythonANN.f90'
+			 enable runtime linking of shared lib via 'install_name_tool -change libplugin.dylib @loader_path/pythonANN/libplugin.dylib run_test'
+                                                    	      and 'install_name_tool -add_rpath @loader_path/pythonANN/ run_test'
+
+	3. ./run_test
+
+
+ - - - - - - - - - - - - 
+
+Dependencies: 
+
+Python 3 (limited support for Python 2) 
+	
+	- os
+	- sys
+	- __future__ (for python 2 support)
+	- warnings
+	- cffi
+	- numpy
+	- scipy
+	- tensorflow
+	- tensorflow.keras

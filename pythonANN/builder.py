@@ -1,6 +1,12 @@
+import sys
 import cffi
 
 ffibuilder = cffi.FFI()
+
+if 'linux' in sys.platform:
+    OS = 'linux'
+else: # MacOS?
+    OS = 'macOS'
 
 header = '''
 extern void get_rates(double *, double *, double *, double *, double *, int32_t *, double *, double *);
@@ -50,6 +56,11 @@ ffibuilder.set_source('my_plugin', r'''
 ''')
 
 ffibuilder.embedding_init_code(module)
-ffibuilder.compile(target='libplugin.dylib', verbose=True)
+
+if OS == 'linux':
+    ffibuilder.compile(target='libplugin.so', verbose=True)
+elif OS == 'macOS':
+    ffibuilder.compile(target='libplugin.dylib', verbose=True)
+
 
 ### run build with 'python builder.py' ###

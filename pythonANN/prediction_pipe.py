@@ -1,12 +1,9 @@
 #prediciton_pipe.py
 
+from __future__ import print_function
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 import numpy as np
-#import warnings
-#warnings.simplefilter(action='ignore', category=FutureWarning)
-#warnings.simplefilter(action='ignore', category=DeprecationWarning)
-#warnings.simplefilter(action='ignore', category=Warning)
 
 from transform_tools import final_sampling_bands, transform_single_spectrum, skim_TS
 
@@ -20,7 +17,7 @@ def single_spectrum_transform(S, bands=final_sampling_bands(), samples_per_band=
                               lin_bip_idx=[1], manual_idx=[3], manual=[3.6e5, 4.8e5, 6e5, 8e5, 14.6e5, 32e5],
                               verbose=0):
 
-    verboseprint = print if verbose else lambda *a, **k: None
+    verboseprint = print_function if verbose else lambda *a, **k: None
 
     verboseprint('Transforming spectrum ')
     TS, __ = transform_single_spectrum(S, samples_per_band, bands=bands, array_out=True,
@@ -35,7 +32,7 @@ def single_spectrum_transform(S, bands=final_sampling_bands(), samples_per_band=
 # taken from LEGACY/B_datasets/DataSet_utils.py (Jan 29., commit 29e4f8932c5f0231d58797e510e7d488929859b8)
 def fixed_coeff_scaler(data, coeffs, slopes_inds=[23, 24, 25], mode='to_unit', verbose=0):
 
-    verboseprint = print if verbose else lambda *a, **k: None
+    verboseprint = print_function if verbose else lambda *a, **k: None
 
     if mode == 'to_unit':
 
