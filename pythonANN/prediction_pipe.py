@@ -1,25 +1,44 @@
 #prediciton_pipe.py
 
-from __future__ import print_function
 import os
+# supress general warnings
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-import numpy as np
 
-from transform_tools import final_sampling_bands, transform_single_spectrum, skim_TS
-
-from tensorflow.keras.models import load_model
+# supress tensorflow warnings
 from tensorflow import compat
 compat.v1.logging.set_verbosity(compat.v1.logging.ERROR)
 
+import numpy as np
+from transform_tools import final_sampling_bands, transform_single_spectrum, skim_TS
+from tensorflow.keras.models import load_model
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # ESTABLISH STATE (SCALERS, MODELS) OF MODULE # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+# # # # IMPORTANT PATH VARIABLES # # # # # # #
+path_to_scalers = './pythonANN/scalers'  # scalers usually shipped in this directory
+path_to_models = './pythonANN/models' # models usually shipped in this directory
+
+# # # # # LOADING SCALERS & MODELS # # # # # # # #
+x_scaling_coeffs = np.loadtxt(os.path.join(path_to_scalers, 'x_scaling_coeffs.txt'))
+y_scaling_coeffs = np.loadtxt(os.path.join(path_to_scalers, 'y_scaling_coeffs.txt'))
+LH_model = load_model(os.path.join(path_to_models, 'LH_MODEL'))
+ER_model = load_model(os.path.join(path_to_models, 'ER_MODEL'))
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # #            FUNCTION DEFINITIONS             # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 #functional implementation of spectrum transformation
 def single_spectrum_transform(S, bands=final_sampling_bands(), samples_per_band=[5, 3, 5, 6, 1],
-                              lin_bip_idx=[1], manual_idx=[3], manual=[3.6e5, 4.8e5, 6e5, 8e5, 14.6e5, 32e5],
-                              verbose=0):
+                              lin_bip_idx=[1], manual_idx=[3], manual=[3.6e5, 4.8e5, 6e5, 8e5, 14.6e5, 32e5]):
 
-    verboseprint = print_function if verbose else lambda *a, **k: None
+    #verboseprint = print_function if verbose else lambda *a, **k: None
 
-    verboseprint('Transforming spectrum ')
+    #verboseprint('Transforming spectrum ')
     TS, __ = transform_single_spectrum(S, samples_per_band, bands=bands, array_out=True,
                                           lin_bip_idx=lin_bip_idx, manual_idx=manual_idx, manual=manual)
 
@@ -30,9 +49,11 @@ def single_spectrum_transform(S, bands=final_sampling_bands(), samples_per_band=
 
 # function for (reverse) scaling of x_data and y_data when scaling coefficients exist already
 # taken from LEGACY/B_datasets/DataSet_utils.py (Jan 29., commit 29e4f8932c5f0231d58797e510e7d488929859b8)
+
+
 def fixed_coeff_scaler(data, coeffs, slopes_inds=[23, 24, 25], mode='to_unit', verbose=0):
 
-    verboseprint = print_function if verbose else lambda *a, **k: None
+    #verboseprint = print_function if verbose else lambda *a, **k: None
 
     if mode == 'to_unit':
 
@@ -61,7 +82,7 @@ def fixed_coeff_scaler(data, coeffs, slopes_inds=[23, 24, 25], mode='to_unit', v
                 else:
                     scaled_data = np.concatenate((scaled_data, scaled_col_data.reshape(-1, 1)), axis=1)
 
-            verboseprint('\ntest scaling:\n', np.amax(scaled_data, axis=0), '\n', np.amin(scaled_data, axis=0))
+            #verboseprint('\ntest scaling:\n', np.amax(scaled_data, axis=0), '\n', np.amin(scaled_data, axis=0))
 
             return scaled_data
 
@@ -119,10 +140,6 @@ def x_data_treatment(T_gas, nH, n_H, rf, x_scaler):
 # main function:
 def make_prediction(T_gas, nH, n_H, lam, u):
 
-    # # # # IMPORTANT PATH VARIABLES # # # # # # #
-    path_to_scalers = './pythonANN/scalers'  # scalers usually shipped in this directory
-    path_to_models = './pythonANN/models' # models usually shipped in this directory
-
     # # # # # # # CAST ARRAYS INTO S # # # # # # #
     lam = lam.reshape(-1, 1)
     u = u.reshape(-1, 1)
@@ -131,18 +148,11 @@ def make_prediction(T_gas, nH, n_H, lam, u):
     # # # # # # # TRANSFORM SPECTRUM # # # # # # #
     rf = single_spectrum_transform(S)
 
-    # # # # # LOADING DATA SCALERS # # # # # # # #
-    x_scaling_coeffs = np.loadtxt(os.path.join(path_to_scalers, 'x_scaling_coeffs.txt'))
-    y_scaling_coeffs = np.loadtxt(os.path.join(path_to_scalers, 'y_scaling_coeffs.txt'))
-
     # # # # # INPUT DATA TREATMENT # # # # # # # #
     x = x_data_treatment(T_gas, nH, n_H, rf, x_scaling_coeffs)
 
-    # # # # # LOADING MODELS # # # # # # # #
-    LH_model = load_model(os.path.join(path_to_models, 'LH_MODEL'))
-    ER_model = load_model(os.path.join(path_to_models, 'ER_MODEL'))
-
     # # # # # MAKE PREDICTIONS # # # # # # #
+
     lh = LH_model.predict(x)
     er = ER_model.predict(x)
     y = np.array([lh, er]).reshape(1, -1)

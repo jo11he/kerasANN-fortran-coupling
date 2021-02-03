@@ -31,6 +31,13 @@ PROGRAM COUPLING_TEST
    real*8                              :: LH
    real*8                              :: ER
 
+   !LOOPING AND TIMING
+   integer                             :: i
+   integer                             :: ANNcount = 0
+   real*8                              :: time1
+   real*8                              :: time2
+
+
    !ASSIGN INPUT VALUES (sample 1 of testT01)
    T_gas = 4.113083490000000353e+01
    nH = 1.194153369999999995e+05
@@ -58,9 +65,16 @@ PROGRAM COUPLING_TEST
 
 
    !!!! ACTION !!!!
-   call get_rates(T_gas, nH, n_H, l, u, size(u), LH, ER)
-   PRINT *, LH
-   PRINT *, ER
+   DO i=1,100
+       CALL CPU_TIME(time1)
+       call get_rates(T_gas, nH, n_H, l, u, size(u), LH, ER)
+       CALL CPU_TIME(time2)
+       ANNcount = ANNcount+1
+       WRITE(*,'(A11,ES10.3,A6,I4)') 'ANN call : ', time2 - time1, 's - no', ANNcount
+       PRINT *, LH
+       PRINT *, ER
+   END DO
+
 
    !DESIRED OUTPUT:
    ! LH 4.454582101342124460e-18

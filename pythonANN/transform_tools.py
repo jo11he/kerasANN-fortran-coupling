@@ -2,17 +2,11 @@
 #########################################################################
 # # # # # # # # # Transformation functions and wrapper # # # # # # # # #
 #########################################################################
-from __future__ import print_function
+
 import numpy as np
 import scipy as sc
 import scipy.interpolate
 import scipy.integrate
-import warnings
-
-warnings.simplefilter(action='ignore', category=FutureWarning)
-warnings.simplefilter(action='ignore', category=DeprecationWarning)
-
-
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -168,12 +162,13 @@ def skim_TS(data):
 def transform_single_spectrum(S, s_per_b, bands=final_sampling_bands(), array_in=[], array_out=True, lin_bip_idx=[1],
                        manual_idx=[], manual=[], verbose=0):
 
-    verboseprint = print_function if verbose else lambda *a, **k: None
+    #verboseprint = print_function if verbose else lambda *a, **k: None
 
     TS_lst = []
     S_p_lst = []
 
-    verboseprint(s_per_b)
+    #verboseprint(s_per_b)
+
     band_idx = 0
 
     for band, n_sample in zip(bands, s_per_b):
@@ -195,15 +190,15 @@ def transform_single_spectrum(S, s_per_b, bands=final_sampling_bands(), array_in
         # take n_samples for this band then conduct partial transform
 
         if band_idx in lin_bip_idx:
-            verboseprint('unweighted lin_by_part active in interval ', band_idx, band)
+            #verboseprint('unweighted lin_by_part active in interval ', band_idx, band)
             TS_band, S_p_band = downsample_band(x_band, y_band, n_sample, lin_bipart=True, manual=[])
 
         elif band_idx in manual_idx:
-            verboseprint('unweighted by part on manual points ', band_idx, band)
+            #verboseprint('unweighted by part on manual points ', band_idx, band)
             n_sample = len(manual)
             TS_band, S_p_band = downsample_band(x_band, y_band, n_sample, lin_bipart=False, manual=manual)
         else:
-            verboseprint('generic unweighted transformation in interval', band_idx, band)
+            #verboseprint('generic unweighted transformation in interval', band_idx, band)
             TS_band, S_p_band = downsample_band(x_band, y_band, n_sample, lin_bipart=False, manual=[])
 
         TS_lst.append(TS_band)
