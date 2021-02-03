@@ -1,3 +1,6 @@
+# builder.py
+# run through make_test.sh or manually according to README instructions
+
 import sys
 import cffi
 
@@ -63,4 +66,3 @@ elif OS == 'macOS':
     ffibuilder.compile(target='libplugin.dylib', verbose=True)
 
 
-### run build with 'python builder.py' ###

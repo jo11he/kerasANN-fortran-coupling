@@ -1,37 +1,45 @@
-Structured, quiet version of ANN-PDR integration:
+Structured, quiet and high-performing version of ANN-PDR integration:
 	
 	- testfile ./test_pythonANN.f90
 	- all code for integration is bundeled in ./pythonANN
 
 	
-	1. in ./pythonANN run python builder.py -> creates shared libraries for given machine 
-		
-		linux: results in libplugin.so 
-		macOS: results in libplugin.dylib
-		-> has to be followed up by 'install_name_tool -id "@loader_path/pythonANN/libplugin.dylib" libplugin.dylib' for runtime linking 
+	STEP1 AUTOMATICALLY:
 
-	2. in . compile fortran executable with linked shared library 
+	1. ./make_test.sh , will facilitate steps 1.1 and 1.2 automatically - by default macOS, for linux change in sh script
 
-		linux: use 'gfortran -o run_test -Wl,-rpath=./pythonANN/ -L ./pythonANN/ -lplugin test_pythonANN.f90'
-			runtime linking of shared lib enables via -Wl,-rpath=./pythonANN/ flag		
 
-		macOS: use 'gfortran -o run_test -L ./pythonANN/ -lplugin test_pythonANN.f90'
-			 enable runtime linking of shared lib via 'install_name_tool -change libplugin.dylib @loader_path/pythonANN/libplugin.dylib run_test'
-                                                    	      and 'install_name_tool -add_rpath @loader_path/pythonANN/ run_test'
+	STEP1 MANUALLY:
 
-	3. ./run_test
+	(1.1 in ./pythonANN run python builder.py -> creates shared libraries for given machine 
+	(	
+	(	linux: results in libplugin.so 
+	(	macOS: results in libplugin.dylib
+	(	-> has to be followed up by 'install_name_tool -id "@loader_path/pythonANN/libplugin.dylib" libplugin.dylib' for runtime linking 
+
+	(1.2 in . compile fortran executable with linked shared library 
+	(
+	(	linux: use 'gfortran -o run_test -Wl,-rpath=./pythonANN/ -L ./pythonANN/ -lplugin test_pythonANN.f90'
+	(		runtime linking of shared lib enables via -Wl,-rpath=./pythonANN/ flag		
+	(
+	(	macOS: use 'gfortran -o run_test -L ./pythonANN/ -lplugin test_pythonANN.f90'
+	(		 enable runtime linking of shared lib via 'install_name_tool -change libplugin.dylib @loader_path/pythonANN/libplugin.dylib run_test'
+	(                                         	             and 'install_name_tool -add_rpath @loader_path/pythonANN/ run_test'
+	
+
+	STEP2:
+
+	2. ./run_test
 
 
  - - - - - - - - - - - - 
 
 Dependencies: 
 
-Python 3 (limited support for Python 2) 
+Python 3
 	
 	- os
 	- sys
-	- __future__ (for python 2 support)
-	- warnings
 	- cffi
 	- numpy
 	- scipy

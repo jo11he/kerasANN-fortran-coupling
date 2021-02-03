@@ -36,7 +36,7 @@ ER_model = load_model(os.path.join(path_to_models, 'ER_MODEL'))
 def single_spectrum_transform(S, bands=final_sampling_bands(), samples_per_band=[5, 3, 5, 6, 1],
                               lin_bip_idx=[1], manual_idx=[3], manual=[3.6e5, 4.8e5, 6e5, 8e5, 14.6e5, 32e5]):
 
-    #verboseprint = print_function if verbose else lambda *a, **k: None
+    #verboseprint = print if verbose else lambda *a, **k: None
 
     #verboseprint('Transforming spectrum ')
     TS, __ = transform_single_spectrum(S, samples_per_band, bands=bands, array_out=True,
@@ -53,7 +53,7 @@ def single_spectrum_transform(S, bands=final_sampling_bands(), samples_per_band=
 
 def fixed_coeff_scaler(data, coeffs, slopes_inds=[23, 24, 25], mode='to_unit', verbose=0):
 
-    #verboseprint = print_function if verbose else lambda *a, **k: None
+    #verboseprint = print if verbose else lambda *a, **k: None
 
     if mode == 'to_unit':
 

@@ -1,3 +1,5 @@
+# transform_tools.py
+# called from prediciton_pipe (final_sampling_bands, transform_single_spectrum, skim_TS)
 
 #########################################################################
 # # # # # # # # # Transformation functions and wrapper # # # # # # # # #
@@ -162,7 +164,7 @@ def skim_TS(data):
 def transform_single_spectrum(S, s_per_b, bands=final_sampling_bands(), array_in=[], array_out=True, lin_bip_idx=[1],
                        manual_idx=[], manual=[], verbose=0):
 
-    #verboseprint = print_function if verbose else lambda *a, **k: None
+    #verboseprint = print if verbose else lambda *a, **k: None
 
     TS_lst = []
     S_p_lst = []
