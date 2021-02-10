@@ -32,6 +32,13 @@ y_scaling_coeffs = np.loadtxt(os.path.join(path_to_scalers, 'y_scaling_coeffs.tx
 LH_model = load_model(os.path.join(path_to_models, 'LH_MODEL'))
 ER_model = load_model(os.path.join(path_to_models, 'ER_MODEL'))
 
+# # # # # # # DETECT AND SET CURRENT SIM OUT PATH # # # # # # # # #
+out_dir = 'out'
+out_subdirs = [os.path.join(out_dir, d) for d in os.listdir (out_dir)
+               if os.path.isdir(os.path.join(out_dir, d))
+               and d != 'check_ANN']
+current_out = max(out_subdirs, key=os.path.getmtime)
+
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # # #            FUNCTION DEFINITIONS             # # #
@@ -43,7 +50,7 @@ def single_spectrum_transform(S, bands=final_sampling_bands(), samples_per_band=
 
     #verboseprint = print if verbose else lambda *a, **k: None
 
-    #verboseprint('Transforming spectrum ')
+    #verboseprint('Transforming spectrum')
     TS, __ = transform_single_spectrum(S, samples_per_band, bands=bands, array_out=True,
                                           lin_bip_idx=lin_bip_idx, manual_idx=manual_idx, manual=manual)
 
@@ -170,12 +177,12 @@ def make_prediction(T_gas, nH, n_H, lam, u, create_checkpoints=False):
             time1 = time.time()
 
             test_ID = 1
-            save_path = './pythonANN/checkpoint_'+str(test_ID)
+            save_path = os.path.join(current_out, 'ANN_checkpoints', 'checkpoint_'+str(test_ID))
 
             #set output directory
             while os.path.exists(save_path):
                 test_ID = int(save_path.rsplit('checkpoint_', 1)[-1])+1
-                save_path = './pythonANN/checkpoint_' + str(test_ID)
+                save_path = save_path.rsplit('_', 1)[0] + '_' + str(test_ID)
             os.makedirs(save_path)
 
             with open(os.path.join(save_path, 'rf_spectrum.txt'), 'w') as lamu_file, \
@@ -196,9 +203,6 @@ def make_prediction(T_gas, nH, n_H, lam, u, create_checkpoints=False):
                       '\tCreated ANN Checkpoint #'+str(test_ID) + '\n' +
                       '\t   [ cost : ', round(time2 - time1, 3), ' s ]' +
                       '\n # # # # # # # # # # # # # # # # # # # # #  \n ')
-
-
-
 
 
         else:
