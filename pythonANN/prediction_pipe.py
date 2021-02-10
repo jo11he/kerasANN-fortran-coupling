@@ -1,13 +1,18 @@
 #prediciton_pipe.py
 
 import os
+import shutil
+import time
+
 # supress general warnings
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+test_ID = 1
 
 # supress tensorflow warnings
 from tensorflow import compat
 compat.v1.logging.set_verbosity(compat.v1.logging.ERROR)
 
+import random
 import numpy as np
 from transform_tools import final_sampling_bands, transform_single_spectrum, skim_TS
 from tensorflow.keras.models import load_model
@@ -49,8 +54,6 @@ def single_spectrum_transform(S, bands=final_sampling_bands(), samples_per_band=
 
 # function for (reverse) scaling of x_data and y_data when scaling coefficients exist already
 # taken from LEGACY/B_datasets/DataSet_utils.py (Jan 29., commit 29e4f8932c5f0231d58797e510e7d488929859b8)
-
-
 def fixed_coeff_scaler(data, coeffs, slopes_inds=[23, 24, 25], mode='to_unit', verbose=0):
 
     #verboseprint = print if verbose else lambda *a, **k: None
@@ -138,7 +141,7 @@ def x_data_treatment(T_gas, nH, n_H, rf, x_scaler):
 
 
 # main function:
-def make_prediction(T_gas, nH, n_H, lam, u):
+def make_prediction(T_gas, nH, n_H, lam, u, create_checkpoints=False):
 
     # # # # # # # CAST ARRAYS INTO S # # # # # # #
     lam = lam.reshape(-1, 1)
@@ -159,5 +162,46 @@ def make_prediction(T_gas, nH, n_H, lam, u):
 
     # # # SCALE BACK TO PHYSICAL UNITS # # #
     Y = fixed_coeff_scaler(y, y_scaling_coeffs, slopes_inds=[], mode='to_physical')[0]
+
+    if create_checkpoints:
+        # # # SAVE INPUTS, SPECTRUM AND COMPUTED RESULTS # # #
+        chance = random.uniform(0, 1)
+        if chance < 0.1:
+            time1 = time.time()
+
+            test_ID = 1
+            save_path = './pythonANN/checkpoint_'+str(test_ID)
+
+            #set output directory
+            while os.path.exists(save_path):
+                test_ID = int(save_path.rsplit('checkpoint_', 1)[-1])+1
+                save_path = './pythonANN/checkpoint_' + str(test_ID)
+            os.makedirs(save_path)
+
+            with open(os.path.join(save_path, 'rf_spectrum.txt'), 'w') as lamu_file, \
+                    open(os.path.join(save_path, 'cloud_params.txt'), 'w') as params_file, \
+                    open(os.path.join(save_path, 'rate_coeffs.txt'), 'w') as result_file:
+
+                lamu_file.write('# [0] lambda (nm), [1] u_lambda (erg.cm-3.A-1)\n')
+                params_file.write('# [0] T_gas (K), [1] n(H) (cm-3), [2] n(H) (cm-3)\n')
+                result_file.write('# [0] R_LH (cm3.s-1), [1] R_ER (cm3.s-1)\n')
+
+                np.savetxt(lamu_file, S)
+                np.savetxt(params_file, np.array([T_gas, nH, n_H]), newline=' ')
+                np.savetxt(result_file, np.array([Y[0], Y[1]]), newline=' ')
+
+                time2 = time.time()
+
+                print('\n # # # # # # # # # # # # # # # # # # # # #  \n '
+                      '\tCreated ANN Checkpoint #'+str(test_ID) + '\n' +
+                      '\t   [ cost : ', round(time2 - time1, 3), ' s ]' +
+                      '\n # # # # # # # # # # # # # # # # # # # # #  \n ')
+
+
+
+
+
+        else:
+            pass
 
     return Y[0], Y[1]

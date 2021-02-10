@@ -6,10 +6,8 @@ import cffi
 
 ffibuilder = cffi.FFI()
 
-if 'linux' in sys.platform:
-    OS = 'linux'
-else: # MacOS?
-    OS = 'macOS'
+if len(sys.argv) < 2: raise ValueError('missing input at position 1 ($OSTYPE)')
+else: OS = sys.argv[1]
 
 header = '''
 extern void get_rates(double *, double *, double *, double *, double *, int32_t *, double *, double *);
@@ -38,11 +36,8 @@ def get_rates(x1_ptr, x2_ptr, x3_ptr, x4_ptr, x5_ptr, n_ptr, y1_ptr, y2_ptr):
     lam = gearbox.as_array(ffi, x4_ptr, shape=(n,))
     u = gearbox.as_array(ffi, x5_ptr, shape=(n,))
     
-    #print('input received: T_gas:' , T_gas, '\t n(H):' , nH, '\t n_H:' , n_H, '\t rf: spectral shape', u.shape, '...')
-    
     # call python main function
-    LH, ER = prediction_pipe.make_prediction(T_gas, nH, n_H, lam, u)
-    #print('Prediction results: ', LH, ER)
+    LH, ER = prediction_pipe.make_prediction(T_gas, nH, n_H, lam, u, create_checkpoints=True)
     
     # gearbox out
     gearbox.get(LH, y1_ptr, 1, ffi)
@@ -53,16 +48,31 @@ def get_rates(x1_ptr, x2_ptr, x3_ptr, x4_ptr, x5_ptr, n_ptr, y1_ptr, y2_ptr):
 with open('plugin.h', 'w') as f:
     f.write(header)
 
-ffibuilder.embedding_api(header)
-ffibuilder.set_source('my_plugin', r'''
-        #include "plugin.h"
-''')
 
-ffibuilder.embedding_init_code(module)
 
-if OS == 'linux':
+if 'linux' in OS:
+
+    print('building dynamic libs for linux')
+    ffibuilder.embedding_api(header)
+    ffibuilder.set_source('my_plugin', r'''
+            #include "plugin.h"
+    ''',
+                          extra_link_args=["-L/shared/apps/python/3.6.7/lib"]
+                          )
+
+    ffibuilder.embedding_init_code(module)
     ffibuilder.compile(target='libplugin.so', verbose=True)
-elif OS == 'macOS':
+
+
+elif 'darwin' in OS:
+
+    print('building dynamic libs for macOS')
+    ffibuilder.embedding_api(header)
+    ffibuilder.set_source('my_plugin', r'''
+            #include "plugin.h"
+    ''')
+
+    ffibuilder.embedding_init_code(module)
     ffibuilder.compile(target='libplugin.dylib', verbose=True)
 
 
