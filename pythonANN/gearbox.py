@@ -51,7 +51,6 @@ def as_single(ffi, ptr, **kwargs):
     length = 1
     T = ffi.getctype(ffi.typeof(ptr).item)
 
-
     if T not in ctype2dtype:
         raise RuntimeError("Cannot create array from element type: %s" % T)
 

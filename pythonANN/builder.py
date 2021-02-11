@@ -20,7 +20,7 @@ else: OS = sys.argv[1] ; HOST = sys.argv[2]
 
 
 header = '''
-extern void get_rates(double *, double *, double *, double *, double *, int32_t *, double *, double *);
+extern void get_rates(double *, double *, double *, double *, double *, int32_t *, double *, double *, int32_t *);
 '''
 
 module = '''
@@ -37,7 +37,7 @@ import prediction_pipe
 from my_plugin import ffi
 
 @ffi.def_extern()
-def get_rates(x1_ptr, x2_ptr, x3_ptr, x4_ptr, x5_ptr, n_ptr, y1_ptr, y2_ptr):
+def get_rates(x1_ptr, x2_ptr, x3_ptr, x4_ptr, x5_ptr, n_ptr, y1_ptr, y2_ptr, b_ptr):
     
     # gearbox in
     T_gas = gearbox.as_single(ffi, x1_ptr)
@@ -46,10 +46,14 @@ def get_rates(x1_ptr, x2_ptr, x3_ptr, x4_ptr, x5_ptr, n_ptr, y1_ptr, y2_ptr):
     n = gearbox.as_single(ffi, n_ptr)
     lam = gearbox.as_array(ffi, x4_ptr, shape=(n,))
     u = gearbox.as_array(ffi, x5_ptr, shape=(n,))
+    b = gearbox.as_single(ffi, b_ptr)
     
     # call python main function
-    LH, ER = prediction_pipe.make_prediction(T_gas, nH, n_H, lam, u, create_checkpoints=True)
-    
+    if b == 1:
+        LH, ER = prediction_pipe.make_prediction(T_gas, nH, n_H, lam, u, create_checkpoints=True)
+    elif b == 0:
+        LH, ER = prediction_pipe.make_prediction(T_gas, nH, n_H, lam, u, create_checkpoints=False)
+
     # gearbox out
     gearbox.get(LH, y1_ptr, 1, ffi)
     gearbox.get(ER, y2_ptr, 1, ffi)
