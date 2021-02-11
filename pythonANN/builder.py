@@ -20,7 +20,7 @@ else: OS = sys.argv[1] ; HOST = sys.argv[2]
 
 
 header = '''
-extern void get_rates(double *, double *, double *, double *, double *, int32_t *, double *, double *, int32_t *);
+extern void get_rates(double *, double *, double *, double *, double *, int32_t *, double *, double *, int32_t *, char *);
 '''
 
 module = '''
@@ -37,7 +37,7 @@ import prediction_pipe
 from my_plugin import ffi
 
 @ffi.def_extern()
-def get_rates(x1_ptr, x2_ptr, x3_ptr, x4_ptr, x5_ptr, n_ptr, y1_ptr, y2_ptr, b_ptr):
+def get_rates(x1_ptr, x2_ptr, x3_ptr, x4_ptr, x5_ptr, n_ptr, y1_ptr, y2_ptr, b_ptr, str_ptr):
     
     # gearbox in
     T_gas = gearbox.as_single(ffi, x1_ptr)
@@ -48,9 +48,13 @@ def get_rates(x1_ptr, x2_ptr, x3_ptr, x4_ptr, x5_ptr, n_ptr, y1_ptr, y2_ptr, b_p
     u = gearbox.as_array(ffi, x5_ptr, shape=(n,))
     b = gearbox.as_single(ffi, b_ptr)
     
+    print(str_ptr, type(str_ptr))
+    sim_name = ffi.string(str_ptr).decode("utf-8", errors="ignore")
+    print(sim_name, type(sim_name))
+    
     # call python main function
     if b == 1:
-        LH, ER = prediction_pipe.make_prediction(T_gas, nH, n_H, lam, u, create_checkpoints=True)
+        LH, ER = prediction_pipe.make_prediction(T_gas, nH, n_H, lam, u, create_checkpoints=True, sim_out=sim_name)
     elif b == 0:
         LH, ER = prediction_pipe.make_prediction(T_gas, nH, n_H, lam, u, create_checkpoints=False)
 
@@ -73,7 +77,7 @@ if 'linux' in OS:
         ffibuilder.set_source('my_plugin', r'''
                 #include "plugin.h"
         ''',
-                              extra_comile_args=FFLAGS,
+                              extra_compile_args=FFLAGS,
                               extra_link_args=["-L/shared/apps/python/3.6.7/lib",
                                                "-Wl,-rpath=/shared/apps/python/3.6.7/lib",
                                                "-L/shared/apps/python/3.6.7/lib/python3.6/site-packages",
@@ -86,7 +90,7 @@ if 'linux' in OS:
         ffibuilder.set_source('my_plugin', r'''
                     #include "plugin.h"
             ''',
-                              extra_comile_args=FFLAGS,
+                              extra_compile_args=FFLAGS,
                               extra_link_args=LIBS
                               )
 
@@ -101,7 +105,7 @@ elif 'darwin' in OS:
     ffibuilder.set_source('my_plugin', r'''
                 #include "plugin.h"
         ''',
-                          extra_comile_args=FFLAGS,
+                          extra_compile_args=FFLAGS,
                           extra_link_args=LIBS
                           )
 

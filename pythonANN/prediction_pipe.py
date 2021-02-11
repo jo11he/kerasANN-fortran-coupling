@@ -35,13 +35,6 @@ y_scaling_coeffs = np.loadtxt(os.path.join(path_to_scalers, 'y_scaling_coeffs.tx
 LH_model = load_model(os.path.join(path_to_models, 'LH_MODEL'))
 ER_model = load_model(os.path.join(path_to_models, 'ER_MODEL'))
 
-# # # # # # # DETECT AND SET CURRENT SIM OUT PATH # # # # # # # # #
-out_dir = 'out'
-out_subdirs = [os.path.join(out_dir, d) for d in os.listdir (out_dir)
-               if os.path.isdir(os.path.join(out_dir, d))
-               and d != 'check_ANN']
-current_out = max(out_subdirs, key=os.path.getmtime)
-
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # # #            FUNCTION DEFINITIONS             # # #
@@ -151,7 +144,7 @@ def x_data_treatment(T_gas, nH, n_H, rf, x_scaler):
 
 
 # main function:
-def make_prediction(T_gas, nH, n_H, lam, u, create_checkpoints=False):
+def make_prediction(T_gas, nH, n_H, lam, u, create_checkpoints=False, sim_out=None):
 
     # # # # # # # CAST ARRAYS INTO S # # # # # # #
     lam = lam.reshape(-1, 1)
@@ -174,6 +167,8 @@ def make_prediction(T_gas, nH, n_H, lam, u, create_checkpoints=False):
     Y = fixed_coeff_scaler(y, y_scaling_coeffs, slopes_inds=[], mode='to_physical')[0]
 
     if create_checkpoints:
+
+        current_out = os.path.join('out', sim_out)
         # # # SAVE INPUTS, SPECTRUM AND COMPUTED RESULTS # # #
         chance = random.uniform(0, 1)
         if chance < 0.1:
