@@ -1,13 +1,23 @@
 # builder.py
-# run through make_test.sh or manually according to README instructions
+# run through make or prebuild.sh
+# to run manually: python3 builder.py $OSTYPE $HOSTNAME
+
+# extra compiling options
+FFLAGS = [] # list of strings
+# extra linking options, passed to ffibuilder.set_source -> see linux-tycho config (l.70)
+# most notably required to link python libraries in non-standard locations
+# set automatically on tycho host platform
+LIBS = [] # list of strings
 
 import sys
 import cffi
 
 ffibuilder = cffi.FFI()
 
-if len(sys.argv) < 2: raise ValueError('missing input at position 1 ($OSTYPE)')
-else: OS = sys.argv[1]
+if len(sys.argv) < 3: raise ValueError('missing input at position 1 ($OSTYPE) or 2 ($HOSTNAME)')
+else: OS = sys.argv[1] ; HOST = sys.argv[2]
+
+
 
 header = '''
 extern void get_rates(double *, double *, double *, double *, double *, int32_t *, double *, double *);
@@ -15,9 +25,10 @@ extern void get_rates(double *, double *, double *, double *, double *, int32_t 
 
 module = '''
 
-import numpy as np
-
 import sys
+if not hasattr(sys, 'argv'):
+    sys.argv  = ['']
+import numpy as np
 # add local dir to load own modules 
 sys.path.extend(['./pythonANN']) #(gearbox, prediction_pipe)
 import gearbox
@@ -49,16 +60,31 @@ with open('plugin.h', 'w') as f:
     f.write(header)
 
 
-
 if 'linux' in OS:
 
-    print('building dynamic libs for linux')
-    ffibuilder.embedding_api(header)
-    ffibuilder.set_source('my_plugin', r'''
-            #include "plugin.h"
-    ''',
-                          extra_link_args=["-L/shared/apps/python/3.6.7/lib"]
-                          )
+    if 'tycho' in HOST:
+        print('building dynamic libs for tycho')
+
+        ffibuilder.embedding_api(header)
+        ffibuilder.set_source('my_plugin', r'''
+                #include "plugin.h"
+        ''',
+                              extra_comile_args=FFLAGS,
+                              extra_link_args=["-L/shared/apps/python/3.6.7/lib",
+                                               "-Wl,-rpath=/shared/apps/python/3.6.7/lib",
+                                               "-L/shared/apps/python/3.6.7/lib/python3.6/site-packages",
+                                               "-Wl,-rpath=/shared/apps/python/3.6.7/lib/python3.6/site-packages",
+                                               ]
+                              )
+
+    else:
+        ffibuilder.embedding_api(header)
+        ffibuilder.set_source('my_plugin', r'''
+                    #include "plugin.h"
+            ''',
+                              extra_comile_args=FFLAGS,
+                              extra_link_args=LIBS
+                              )
 
     ffibuilder.embedding_init_code(module)
     ffibuilder.compile(target='libplugin.so', verbose=True)
@@ -69,8 +95,11 @@ elif 'darwin' in OS:
     print('building dynamic libs for macOS')
     ffibuilder.embedding_api(header)
     ffibuilder.set_source('my_plugin', r'''
-            #include "plugin.h"
-    ''')
+                #include "plugin.h"
+        ''',
+                          extra_comile_args=FFLAGS,
+                          extra_link_args=LIBS
+                          )
 
     ffibuilder.embedding_init_code(module)
     ffibuilder.compile(target='libplugin.dylib', verbose=True)

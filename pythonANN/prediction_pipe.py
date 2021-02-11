@@ -1,8 +1,11 @@
 #prediciton_pipe.py
 
 import os
+import sys
 import shutil
 import time
+
+print(sys.version)
 
 # supress general warnings
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
