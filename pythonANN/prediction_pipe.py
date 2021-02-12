@@ -168,10 +168,11 @@ def make_prediction(T_gas, nH, n_H, lam, u, create_checkpoints=False, sim_out=No
 
     if create_checkpoints:
 
-        current_out = os.path.join('out', sim_out)
+        current_out = os.path.join('out', sim_out.strip(''))
         # # # SAVE INPUTS, SPECTRUM AND COMPUTED RESULTS # # #
         chance = random.uniform(0, 1)
-        if chance < 0.1:
+        if chance < 0.2:
+
             time1 = time.time()
 
             test_ID = 1
@@ -197,7 +198,8 @@ def make_prediction(T_gas, nH, n_H, lam, u, create_checkpoints=False, sim_out=No
 
                 time2 = time.time()
 
-                print('\n # # # # # # # # # # # # # # # # # # # # #  \n '
+                print('\n\n... in path "' + os.path.join(current_out, 'ANN_checkpoints') + '":')
+                print(' # # # # # # # # # # # # # # # # # # # # #  \n '
                       '\tCreated ANN Checkpoint #'+str(test_ID) + '\n' +
                       '\t   [ cost : ', round(time2 - time1, 3), ' s ]' +
                       '\n # # # # # # # # # # # # # # # # # # # # #  \n ')

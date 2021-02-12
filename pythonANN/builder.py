@@ -48,9 +48,11 @@ def get_rates(x1_ptr, x2_ptr, x3_ptr, x4_ptr, x5_ptr, n_ptr, y1_ptr, y2_ptr, b_p
     u = gearbox.as_array(ffi, x5_ptr, shape=(n,))
     b = gearbox.as_single(ffi, b_ptr)
     
-    print(str_ptr, type(str_ptr))
+    # print('str_ptr: ', str_ptr, type(str_ptr))
     sim_name = ffi.string(str_ptr).decode("utf-8", errors="ignore")
-    print(sim_name, type(sim_name))
+    sim_name = ''.join(c for c in sim_name if c.isprintable())
+    # print('sim_name: ', sim_name, type(sim_name))
+    
     
     # call python main function
     if b == 1:
