@@ -80,9 +80,7 @@ if 'linux' in OS:
         ''',
                               extra_compile_args=FFLAGS,
                               extra_link_args=["-L/shared/apps/python/3.6.7/lib",
-                                               "-Wl,-rpath=/shared/apps/python/3.6.7/lib",
-                                               "-L/shared/apps/python/3.6.7/lib/python3.6/site-packages",
-                                               "-Wl,-rpath=/shared/apps/python/3.6.7/lib/python3.6/site-packages",
+                                               "-Wl,-rpath=/shared/apps/python/3.6.7/lib"
                                                ]
                               )
 
