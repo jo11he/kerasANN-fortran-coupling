@@ -4,7 +4,7 @@ PROGRAM COUPLING_TEST
    use, intrinsic :: iso_c_binding
    implicit none
    interface
-      subroutine get_rates(x1, x2, x3, x4, x5, n, y1, y2, b, charlen, dir) bind (c)
+      subroutine get_rates(x1, x2, x3, x4, x5, n, y1, y2, b, dir, charlen) bind (c)
          use iso_c_binding
          real*8                        :: x1
          real*8                        :: x2
@@ -77,7 +77,7 @@ PROGRAM COUPLING_TEST
    b_checkpoints = 1
    DO i=1,100
        CALL CPU_TIME(time1)
-       call get_rates(T_gas, nH, n_H, l, u, size(u), LH, ER, b_checkpoints, modelelen, modele)
+       call get_rates(T_gas, nH, n_H, l, u, size(u), LH, ER, b_checkpoints, modele, modelelen)
        CALL CPU_TIME(time2)
        ANNcount = ANNcount+1
        WRITE(*,'(A11,ES10.3,A6,I4)') 'ANN call : ', time2 - time1, 's - no', ANNcount

@@ -20,7 +20,7 @@ else: OS = sys.argv[1] ; HOST = sys.argv[2]
 
 
 header = '''
-extern void get_rates(double *, double *, double *, double *, double *, int32_t *, double *, double *, int32_t *, int32_t *, char *);
+extern void get_rates(double *, double *, double *, double *, double *, int32_t *, double *, double *, int32_t *, char *, int32_t *);
 '''
 
 module = '''
@@ -37,7 +37,7 @@ import prediction_pipe
 from my_plugin import ffi
 
 @ffi.def_extern()
-def get_rates(x1_ptr, x2_ptr, x3_ptr, x4_ptr, x5_ptr, n_ptr, y1_ptr, y2_ptr, b_ptr, strlen_ptr, str_ptr):
+def get_rates(x1_ptr, x2_ptr, x3_ptr, x4_ptr, x5_ptr, n_ptr, y1_ptr, y2_ptr, b_ptr, str_ptr, strlen_ptr):
     
     # gearbox in
     T_gas = gearbox.as_single(ffi, x1_ptr)
