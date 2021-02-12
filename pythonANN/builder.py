@@ -20,7 +20,7 @@ else: OS = sys.argv[1] ; HOST = sys.argv[2]
 
 
 header = '''
-extern void get_rates(double *, double *, double *, double *, double *, int32_t *, double *, double *, int32_t *, char *);
+extern void get_rates(double *, double *, double *, double *, double *, int32_t *, double *, double *, int32_t *, int32_t *, char *);
 '''
 
 module = '''
@@ -37,7 +37,7 @@ import prediction_pipe
 from my_plugin import ffi
 
 @ffi.def_extern()
-def get_rates(x1_ptr, x2_ptr, x3_ptr, x4_ptr, x5_ptr, n_ptr, y1_ptr, y2_ptr, b_ptr, str_ptr):
+def get_rates(x1_ptr, x2_ptr, x3_ptr, x4_ptr, x5_ptr, n_ptr, y1_ptr, y2_ptr, b_ptr, strlen_ptr, str_ptr):
     
     # gearbox in
     T_gas = gearbox.as_single(ffi, x1_ptr)
@@ -47,12 +47,11 @@ def get_rates(x1_ptr, x2_ptr, x3_ptr, x4_ptr, x5_ptr, n_ptr, y1_ptr, y2_ptr, b_p
     lam = gearbox.as_array(ffi, x4_ptr, shape=(n,))
     u = gearbox.as_array(ffi, x5_ptr, shape=(n,))
     b = gearbox.as_single(ffi, b_ptr)
+    strlen = gearbox.as_single(ffi, strlen_ptr)
     
-    # print('str_ptr: ', str_ptr, type(str_ptr))
-    sim_name = ffi.string(str_ptr).decode("utf-8", errors="ignore")
-    sim_name = ''.join(c for c in sim_name if c.isprintable())
-    # print('sim_name: ', sim_name, type(sim_name))
-    
+    sim_name = ffi.string(str_ptr)[:strlen]
+    sim_name = sim_name.decode("utf-8", errors="ignore")
+    sim_name = sim_name.strip()
     
     # call python main function
     if b == 1:

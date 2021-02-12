@@ -4,7 +4,7 @@ PROGRAM COUPLING_TEST
    use, intrinsic :: iso_c_binding
    implicit none
    interface
-      subroutine get_rates(x1, x2, x3, x4, x5, n, y1, y2, b, dir) bind (c)
+      subroutine get_rates(x1, x2, x3, x4, x5, n, y1, y2, b, charlen, dir) bind (c)
          use iso_c_binding
          real*8                        :: x1
          real*8                        :: x2
@@ -15,7 +15,8 @@ PROGRAM COUPLING_TEST
          real*8                        :: y1
          real*8                        :: y2
          integer(c_int)                :: b
-         character(kind=c_char)        :: dir(200)
+         integer(c_int)                :: charlen
+         character(kind=c_char)        :: dir(charlen)
       end subroutine get_rates
    end interface
 
@@ -40,8 +41,10 @@ PROGRAM COUPLING_TEST
    real*8                              :: time2
 
    !writing checkpoints
-   CHARACTER(200)                      :: modele        = 'simX'    ! Root name of output files
    INTEGER                             :: b_checkpoints             ! boolean int: do we save ANN chechpoints (0 or 1)
+   INTEGER, PARAMETER                  :: modelelen = 100           ! length of simname char
+   CHARACTER(LEN=modelelen)            :: modele    = 'simX'        ! Root name of output files
+
 
 
    !ASSIGN INPUT VALUES (sample 1 of testT01)
@@ -74,7 +77,7 @@ PROGRAM COUPLING_TEST
    b_checkpoints = 1
    DO i=1,100
        CALL CPU_TIME(time1)
-       call get_rates(T_gas, nH, n_H, l, u, size(u), LH, ER, b_checkpoints, TRIM(ADJUSTL(modele)))
+       call get_rates(T_gas, nH, n_H, l, u, size(u), LH, ER, b_checkpoints, modelelen, modele)
        CALL CPU_TIME(time2)
        ANNcount = ANNcount+1
        WRITE(*,'(A11,ES10.3,A6,I4)') 'ANN call : ', time2 - time1, 's - no', ANNcount
