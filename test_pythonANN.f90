@@ -3,42 +3,44 @@
 PROGRAM COUPLING_TEST
    use, intrinsic :: iso_c_binding
    implicit none
+   INTEGER, PARAMETER :: dp = SELECTED_REAL_KIND(P=15)
    interface
       subroutine get_rates(x1, x2, x3, x4, x5, n, y1, y2, b, dir, charlen) bind (c)
          use iso_c_binding
-         real*8                        :: x1
-         real*8                        :: x2
-         real*8                        :: x3
-         integer(c_int)                :: n
-         real*8                        :: x4(n)
-         real*8                        :: x5(n)
-         real*8                        :: y1
-         real*8                        :: y2
-         integer(c_int)                :: b
-         integer(c_int)                :: charlen
-         character(kind=c_char)        :: dir(charlen)
+         INTEGER, PARAMETER :: dp = SELECTED_REAL_KIND(P=15)
+         REAL (KIND=dp)                         :: x1
+         REAL (KIND=dp)                         :: x2
+         REAL (KIND=dp)                         :: x3
+         integer(c_int)                         :: n
+         REAL (KIND=dp)                         :: x4(n)
+         REAL (KIND=dp)                         :: x5(n)
+         REAL (KIND=dp)                         :: y1
+         REAL (KIND=dp)                         :: y2
+         integer(c_int)                         :: b
+         integer(c_int)                         :: charlen
+         character(kind=c_char)                 :: dir(charlen)
       end subroutine get_rates
    end interface
 
    !DECLARE INPUT PARAMETERS
-   real*8                              :: T_gas
-   real*8                              :: nH
-   real*8                              :: n_H
+   REAL (KIND=dp)                               :: T_gas
+   REAL (KIND=dp)                               :: nH
+   REAL (KIND=dp)                               :: n_H
 
-   real*8, allocatable                 :: l(:)
-   integer                             :: l_count
-   real*8, allocatable                 :: u(:)
-   integer                             :: u_count
+   REAL (KIND=dp), allocatable                  :: l(:)
+   integer                                      :: l_count
+   REAL (KIND=dp), allocatable                  :: u(:)
+   integer                                      :: u_count
 
    !DECLARE OUPUTS
-   real*8                              :: LH
-   real*8                              :: ER
+   REAL (KIND=dp)                               :: LH
+   REAL (KIND=dp)                               :: ER
 
    !LOOPING AND TIMING
-   integer                             :: i
-   integer                             :: ANNcount = 0
-   real*8                              :: time1
-   real*8                              :: time2
+   integer                                      :: i
+   integer                                      :: ANNcount = 0
+   REAL (KIND=dp)                               :: time1
+   REAL (KIND=dp)                               :: time2
 
    !writing checkpoints
    INTEGER                             :: b_checkpoints             ! boolean int: do we save ANN chechpoints (0 or 1)
@@ -48,9 +50,9 @@ PROGRAM COUPLING_TEST
 
 
    !ASSIGN INPUT VALUES (sample 1 of testT01)
-   T_gas = 4.113083490000000353e+01
-   nH = 1.194153369999999995e+05
-   n_H = 1.000000000000000000e+08
+   T_gas = 4.113083490000000353e+01_dp
+   nH = 1.194153369999999995e+05_dp
+   n_H = 1.000000000000000000e+08_dp
 
    !read in lambda from test file
 	open (unit=1, file='./pythonANN/test_data/lam_test.txt', status='old', action='read')
@@ -86,9 +88,13 @@ PROGRAM COUPLING_TEST
    END DO
 
 
-   !DESIRED OUTPUT:
+   !DESIRED OUTPUT: (LABEL)
    ! LH 4.454582101342124460e-18
    ! ER 1.761998920326483102e-19
+
+   !EXPECTED OUTPUT: (pyANN)
+   ! LH 4.4375609429122016e-18
+   ! ER 1.7884691743859221e-19
 
 END PROGRAM COUPLING_TEST
 

@@ -43,6 +43,7 @@ def get_rates(x1_ptr, x2_ptr, x3_ptr, x4_ptr, x5_ptr, n_ptr, y1_ptr, y2_ptr, b_p
     T_gas = gearbox.as_single(ffi, x1_ptr)
     nH = gearbox.as_single(ffi, x2_ptr) 
     n_H = gearbox.as_single(ffi, x3_ptr)
+    
     n = gearbox.as_single(ffi, n_ptr)
     lam = gearbox.as_array(ffi, x4_ptr, shape=(n,))
     u = gearbox.as_array(ffi, x5_ptr, shape=(n,))

@@ -27,7 +27,7 @@ from tensorflow.keras.models import load_model
 
 # # # # IMPORTANT PATH VARIABLES # # # # # # #
 path_to_scalers = './pythonANN/scalers'  # scalers usually shipped in this directory
-path_to_models = './pythonANN/models' # models usually shipped in this directory
+path_to_models = './pythonANN/models'  # models usually shipped in this directory
 
 # # # # # LOADING SCALERS & MODELS # # # # # # # #
 x_scaling_coeffs = np.loadtxt(os.path.join(path_to_scalers, 'x_scaling_coeffs.txt'))
@@ -168,7 +168,7 @@ def make_prediction(T_gas, nH, n_H, lam, u, create_checkpoints=False, sim_out=No
 
     if create_checkpoints:
 
-        current_out = os.path.join('out', sim_out.strip(''))
+        current_out = os.path.join('out', sim_out.strip())
         # # # SAVE INPUTS, SPECTRUM AND COMPUTED RESULTS # # #
         chance = random.uniform(0, 1)
         if chance < 0.2:
@@ -203,7 +203,6 @@ def make_prediction(T_gas, nH, n_H, lam, u, create_checkpoints=False, sim_out=No
                       '\tCreated ANN Checkpoint #'+str(test_ID) + '\n' +
                       '\t   [ cost : ', round(time2 - time1, 3), ' s ]' +
                       '\n # # # # # # # # # # # # # # # # # # # # #  \n ')
-
 
         else:
             pass
