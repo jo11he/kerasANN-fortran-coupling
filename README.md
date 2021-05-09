@@ -11,19 +11,19 @@ Environment structure:
 - test_pythonANN.f90, imitating the global .f90 simulation, containing the cbind interface definition on the .f90 side
 - test_data directory, containing the rf spectrum state variables that are loaded into test_pythonANN.f90 (too large to hardcode into test_pythonANN.f90 like other state variables)
 - pythonANN directory
-        - prediction_pipe.py, transform_tools.py containing all functionality for the data conversion and ANN prediction problem, loading the ANN models and data scalers from the respective subdirectories 
-        - gearbox.py containing all the conversion functions between python to C types
-        - builder.py containing the static signature and definition of the shared function 'get_rates()' and the cffi command to build to shared library 'libplugin'
+    - prediction_pipe.py, transform_tools.py containing all functionality for the data conversion and ANN prediction problem, loading the ANN models and data scalers from the respective subdirectories 
+    - gearbox.py containing all the conversion functions between python to C types
+    - builder.py containing the static signature and definition of the shared function 'get_rates()' and the cffi command to build to shared library 'libplugin'
 		
 
 
 Run Coupling Test:
 
 1. Compile TEST code via Makefile, entails two steps:
-    A. Makefile is executing "prebuild.sh", which will facilitate building shared library via builder.py.
-    --> results in  .c, .o, .h files and the shared library 'libplugin', all contained within the "pythonANN" directory (design decision for tidiness of .f90 source code, at cost of complicated linking procedure
-    B. Makefile makes executable for TEST code and link the shared library via LIBS argument.
-    --> results in RUN_TEST executable for running the test
+    - Makefile is executing "prebuild.sh", which will facilitate building shared library via builder.py.
+        --> results in  .c, .o, .h files and the shared library 'libplugin', all contained within the "pythonANN" directory (design decision for tidiness of .f90 source code, at cost of complicated \\ linking procedure
+    - Makefile makes executable for TEST code and link the shared library via LIBS argument \\
+        --> results in RUN_TEST executable for running the test
     
 2. Run Test Code ./RUN_TEST
 
