@@ -1,12 +1,13 @@
 Minimal-Example of kerasANN-f90 integration
-- - - - - - - - - - - - - - - - - - - - - - 
+============================================
+
 I used this as an environment to develop the ANN-f90 coupling before integration with the global .f90 simulation.
 
 The requirements on the interface between pythonANN and f90 global simulation were as follows:
 State variables (local gas cloud conditions + high-dimensional radiation field spectrum) are passed from .f90 simulation to pythonANN, but remain unchanged. They only serve as an input to the prediction problem, which returns two new variables (H2 formation rates) to the .f90 global simulation.
 
 Environment structure:
-# # # # # # # # # # # #
+------------------------------
 
 - test_pythonANN.f90, imitating the global .f90 simulation, containing the cbind interface definition on the .f90 side
 - test_data directory, containing the rf spectrum state variables that are loaded into test_pythonANN.f90 (too large to hardcode into test_pythonANN.f90 like other state variables)
@@ -18,7 +19,7 @@ Environment structure:
 
 
 Run Coupling Test:
-# # # # # # # # # #
+------------------------------
 
 1. Compile TEST code via Makefile, entails two steps:
     - Makefile is executing "prebuild.sh", which will facilitate building shared library via builder.py
@@ -30,7 +31,7 @@ Run Coupling Test:
 
 
 Output:
-# # # #
+------------------------------
 
 The test_pythonANN.f90 simulates the global .f90 simulation, in which the ANN is called via the shared function get_rates() in a for loop (simulating local iterations, n=100).
 The get_rates() function is fed the same inputs (state variables) from .f90 again and again, so all ANN outputs are identical. The time for each call of the shared function is measured.
@@ -44,12 +45,13 @@ The implementation contains an added feature which is the creation of so called 
 
 
 Compatibility:
-# # # # # # # # 
+------------------------------ 
 
 This procedure is guaranteed to work on Mac OS (Darwin). Linux compatibility is highly customized for specific host (named tycho) and does not guarantee compatibility with other linux configurations (but certainly offers a good starting point!).
 
+
 Dependencies:
-# # # # # # # 
+------------------------------
 
 Python 3
 - os
