@@ -43,7 +43,7 @@ PROGRAM COUPLING_TEST
    REAL (KIND=dp)                               :: time2
 
    !writing checkpoints
-   INTEGER                             :: b_checkpoints             ! boolean int: do we save ANN chechpoints (0 or 1)
+   INTEGER                             :: b_checkpoints             ! boolean int: do we save ANN checkpoints (0 or 1)
    INTEGER, PARAMETER                  :: modelelen = 100           ! length of simname char
    CHARACTER(LEN=modelelen)            :: modele    = 'simX'        ! Root name of output files
 
@@ -55,7 +55,7 @@ PROGRAM COUPLING_TEST
    n_H = 1.000000000000000000e+08_dp
 
    !read in lambda from test file
-	open (unit=1, file='./pythonANN/test_data/lam_test.txt', status='old', action='read')
+	open (unit=1, file='./test_data/lam_test.txt', status='old', action='read')
 
 		read(1,*) l_count
 		allocate (l(l_count))
@@ -65,7 +65,7 @@ PROGRAM COUPLING_TEST
 	close(1)
 
    !read in u from test file
-   	open (unit=1, file='./pythonANN/test_data/u_test.txt', status='old', action='read')
+   	open (unit=1, file='./test_data/u_test.txt', status='old', action='read')
 
 		read(1,*) u_count
 		allocate (u(u_count))
