@@ -20,9 +20,9 @@ Environment structure:
 Run Coupling Test:
 
 1. Compile TEST code via Makefile, entails two steps:
-    - Makefile is executing "prebuild.sh", which will facilitate building shared library via builder.py.
-        --> results in  .c, .o, .h files and the shared library 'libplugin', all contained within the "pythonANN" directory (design decision for tidiness of .f90 source code, at cost of complicated \\ linking procedure
-    - Makefile makes executable for TEST code and link the shared library via LIBS argument \\
+    - Makefile is executing "prebuild.sh", which will facilitate building shared library via builder.py
+        --> results in  .c, .o, .h files and the shared library 'libplugin', all contained within the "pythonANN" directory (design decision for tidiness of .f90 source code, at cost of complicated linking procedure
+    - Makefile makes executable for TEST code and link the shared library via LIBS argument
         --> results in RUN_TEST executable for running the test
     
 2. Run Test Code ./RUN_TEST
