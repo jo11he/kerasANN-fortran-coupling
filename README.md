@@ -1,11 +1,19 @@
 Minimal-Example of kerasANN-f90 integration
 ============================================
 
-Suggested solution for calling a python subroutine (in this case a keras ANN) from a fortran simulation, modelled after @nbren12 's blog post https://www.noahbrenowitz.com/post/calling-fortran-from-python/ . Also check out @nbren12 's library https://github.com/nbren12/call_py_fort.
-In this repository I present a minimal example solution for my specific usecase which I describe below. The example was derived from the environment which I used to develop the ANN-f90 coupling prior to integration with the global .f90 simulation.
+Suggested solution for calling a python subroutine (in this case a keras ANN) from a fortran simulation.
+I present a minimal example solution for my specific usecase which I describe below. The example was derived from the environment which I used to develop the ANN-f90 coupling prior to integration with the global .f90 simulation.
+
+Modelled after @nbren12 's blog post https://www.noahbrenowitz.com/post/calling-fortran-from-python/ . 
+Also check out @nbren12 's library https://github.com/nbren12/call_py_fort.
+
+
+Requirements on python - fortran interface:
+-------------------------------------------
 
 The requirements on the interface between pythonANN and f90 global simulation were as follows:
 State variables (local gas cloud conditions + high-dimensional radiation field spectrum) are passed from .f90 simulation to pythonANN, but remain unchanged. They only serve as an input to the prediction problem, which returns two new variables (H2 formation rates) to the .f90 global simulation.
+
 
 Environment structure:
 ------------------------------
